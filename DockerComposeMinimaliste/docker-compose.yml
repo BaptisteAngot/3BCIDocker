@@ -11,6 +11,13 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mydb
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: bdd
+      MYSQL_ROOT_PASSWORD: root
 
 # Lancement des services
 # docker-compose up -d
