@@ -3,6 +3,8 @@ version: '3'
 networks:
   backend_network: # Réseau privé API <-> DB (inaccessible de l'extérieur)
     internal: true
+  frontend_network: # Réseau pour permettre au frontend d’appeler l'API
+    driver: bridge
 
 services:
   db:
@@ -13,6 +15,8 @@ services:
     volumes:
         - db_data:/var/lib/mysql
         - ./db-init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+        - backend_network
     healthcheck:
         test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
         timeout: 20s
@@ -22,10 +26,19 @@ services:
     build: ./node-api
     expose:
         - "3000" # API exposée uniquement à d'autres conteneurs du réseau
-    ports:
-      - "3000:3000"
     depends_on:
         db:
             condition: service_healthy
+    networks:
+        - backend_network
+        - frontend_network
+  frontend:
+    build: ./frontend
+    ports:
+        - "8080:80" # Seul le frontend est accessible publiquement
+    depends_on:
+      - api
+    networks:
+        - frontend_network
 volumes:
     db_data:
