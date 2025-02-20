@@ -42,3 +42,5 @@ services:
         - frontend_network
 volumes:
     db_data:
+
+#  docker compose up --build --force-recreate -V
